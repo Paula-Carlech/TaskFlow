@@ -11,3 +11,8 @@ cd taskflow
 composer install
 npm install
 npm run dev
+
+symfony server:start
+http://localhost:8000
+
+http://localhost/phpmyadmin

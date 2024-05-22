@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Task{% endblock %}
+
+{% block body %}
+<h2>Create New Task</h2>
+{{ form_start(form) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.description) }}
+    {{ form_row(form.color) }}
+    <button class="btn">Create</button>
+{{ form_end(form) }}
+{% endblock %}

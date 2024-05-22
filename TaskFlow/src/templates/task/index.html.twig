@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista de Tarefas{% endblock %}
+
+{% block body %}
+<h2>Lista de Tarefas</h2>
+<a href="{{ path('task_new') }}" class="btn btn-primary">Nova Tarefa</a>
+<div class="task-columns">
+    <div class="task-column" id="newTasks">
+        <h3>Nova Tarefa</h3>
+        <div class="task-list">
+            {% for task in new_tasks %}
+                <div class="task-item" data-id="{{ task.id }}" style="background-color: {{ task.color }};">
+                    <h4>{{ task.title }}</h4>
+                    <p>{{ task.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="task-column" id="inProgressTasks">
+        <h3>Em Progresso</h3>
+        <div class="task-list">
+            {% for task in in_progress_tasks %}
+                <div class="task-item" data-id="{{ task.id }}" style="background-color: {{ task.color }};">
+                    <h4>{{ task.title }}</h4>
+                    <p>{{ task.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="task-column" id="finishedTasks">
+        <h3>Finalizado</h3>
+        <div class="task-list">
+            {% for task in finished_tasks %}
+                <div class="task-item" data-id="{{ task.id }}" style="background-color: {{ task.color }};">
+                    <h4>{{ task.title }}</h4>
+                    <p>{{ task.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="csrf_token" value="{{ csrf_token('task_status') }}">
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var newTasks = document.getElementById('newTasks');
+        var inProgressTasks = document.getElementById('inProgressTasks');
+        var finishedTasks = document.getElementById('finishedTasks');
+        var csrfToken = document.getElementById('csrf_token').value;
+
+        [newTasks, inProgressTasks, finishedTasks].forEach(function (column) {
+            new Sortable(column, {
+                group: 'tasks',
+                animation: 150,
+                onEnd: function (evt) {
+                    var taskId = evt.item.getAttribute('data-id');
+                    var newStatus = evt.to.getAttribute('id');
+
+                    // Adjust newStatus to match your database values
+                    switch (newStatus) {
+                        case 'newTasks':
+                            newStatus = 'new';
+                            break;
+                        case 'inProgressTasks':
+                            newStatus = 'in_progress';
+                            break;
+                        case 'finishedTasks':
+                            newStatus = 'completed';
+                            break;
+                    }
+
+                    // Send AJAX request to update task status
+                    fetch(`/tasks/${taskId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-Token': csrfToken
+                        },
+                        body: JSON.stringify({ status: newStatus, _csrf_token: csrfToken })
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
