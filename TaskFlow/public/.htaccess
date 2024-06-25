@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Some hosts require you to use the `RewriteBase` directive.
+    # If you need to use it, just remove the `#` sign of the line below.
+    # You have to change the path, if your project is not in the web root.
+    # This means in the `public` folder:
+    #
+    # RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
