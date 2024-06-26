@@ -46,13 +46,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var newTasks = document.getElementById('newTasks');
-        var inProgressTasks = document.getElementById('inProgressTasks');
-        var finishedTasks = document.getElementById('finishedTasks');
         var csrfToken = document.getElementById('csrf_token').value;
 
-        [newTasks, inProgressTasks, finishedTasks].forEach(function (column) {
-            new Sortable(column, {
+        ['newTasks', 'inProgressTasks', 'finishedTasks'].forEach(function (id) {
+            new Sortable(document.getElementById(id), {
                 group: 'tasks',
                 animation: 150,
                 onEnd: function (evt) {
@@ -81,6 +78,17 @@
                             'X-CSRF-Token': csrfToken
                         },
                         body: JSON.stringify({ status: newStatus, _csrf_token: csrfToken })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== 'ok') {
+                            // Handle error (e.g., show a notification)
+                            alert('Failed to update task status.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating task status:', error);
+                        alert('An error occurred while updating task status.');
                     });
                 }
             });
